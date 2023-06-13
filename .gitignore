@@ -6,3 +6,8 @@ hello_world/*.html
 sqlite3/sqlite3.js
 
 sqljs/sql-wasm.js
+
+node_modules
+
+.cache
+dist

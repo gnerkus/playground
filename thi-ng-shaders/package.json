@@ -1,0 +1,22 @@
+{
+    "name": "thi-ng-shaders",
+    "version": "1.0.0",
+    "description": "",
+    "main": "index.html",
+    "scripts": {
+        "start": "parcel index.html --open",
+        "build": "parcel build index.html"
+    },
+    "dependencies": {
+        "@thi.ng/shader-ast": "0.12.47",
+        "@thi.ng/shader-ast-glsl": "0.4.47",
+        "@thi.ng/shader-ast-js": "0.7.53",
+        "@thi.ng/shader-ast-stdlib": "0.13.10",
+        "@thi.ng/webgl": "6.3.10"
+    },
+    "devDependencies": {
+        "parcel-bundler": "^1.6.1",
+        "typescript": "^5.1.3"
+    },
+    "keywords": []
+}
