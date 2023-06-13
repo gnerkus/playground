@@ -1,3 +1,29 @@
+/**
+ * This is a basic asyncronous shader loader for THREE.js.
+ * 
+ * It uses the built-in THREE.js async loading capabilities to load shaders from files!
+ * 
+ * `onProgress` and `onError` are stadard TREE.js stuff. Look at 
+ * https://threejs.org/examples/webgl_loader_obj.html for an example. 
+ * 
+ * @param {String} vertex_url URL to the vertex shader code.
+ * @param {String} fragment_url URL to fragment shader code
+ * @param {function(String, String)} onLoad Callback function(vertex, fragment) that take as input the loaded vertex and fragment contents.
+ * @param {function} onProgress Callback for the `onProgress` event. 
+ * @param {function} onError Callback for the `onError` event.
+ */
+function ShaderLoader(vertex_url, fragment_url, onLoad, onProgress, onError) {
+  var vertex_loader = new THREE.XHRLoader(THREE.DefaultLoadingManager);
+  vertex_loader.setResponseType('text');
+  vertex_loader.load(vertex_url, function (vertex_text) {
+    var fragment_loader = new THREE.XHRLoader(THREE.DefaultLoadingManager);
+    fragment_loader.setResponseType('text');
+    fragment_loader.load(fragment_url, function (fragment_text) {
+      onLoad(vertex_text, fragment_text);
+    });
+  }, onProgress, onError);
+}
+
 const WIDTH = window.innerWidth;
 const HEIGHT = window.innerHeight;
 
@@ -39,72 +65,39 @@ const uniforms = {
   },
 };
 
-const vertexShader = () => {
-  return `
-  #define GLSLIFY 1
-  // Common varyings
-  varying vec3 v_position;
-  varying vec3 v_normal;
-  
-  /*
-   * The main program
-   */
-  void main() {
-      // Save the varyings
-      v_position = position;
-      v_normal = normalize(normalMatrix * normal);
-  
-      // Vertex shader output
-      gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-  }
-    `;
-};
+// The main problem with async loading is to handle the async flow of the program.
+// This may be make easier with modern JS features such as Promises or async/await.
+//
+// But, for now, we stick to the classic callback style.
+//
+// Because we need the content of the shaders **BEFORE** we can instantiate the 
+// material, we need to put everything that need the cube inside the onLoad callback.
+//
+// This can be done better with a bit of refactoring but I hope you get the idea.
+ShaderLoader("shaders/waveMat.vert", "shaders/waveMat.frag",
+  function (vertex, fragment) {
+    const shaderMaterial = new THREE.ShaderMaterial({
+      uniforms,
+      vertexShader: vertex,
+      fragmentShader: fragment,
+      side: THREE.DoubleSide,
+      transparent: true,
+      extensions: {
+        derivatives: true,
+      },
+    });
 
-const fragmentShader = () => {
-  return `
-  #define GLSLIFY 1
-  // Common uniforms
-  uniform vec2 u_resolution;
-  uniform vec2 u_mouse;
-  uniform float u_time;
-  uniform float u_frame;
-  
-  // Common varyings
-  varying vec3 v_position;
-  varying vec3 v_normal;
-  
-  /*
-   *  Calculates the diffuse factor produced by the light illumination
-   */
-  float diffuseFactor(vec3 normal, vec3 light_direction) {
-      float df = dot(normalize(normal), normalize(light_direction));
-  
-      if (gl_FrontFacing) {
-          df = -df;
-      }
-  
-      return max(0.0, df);
+    const torusKnot = new THREE.Mesh(torusKnotGeometry, shaderMaterial);
+scene.add(torusKnot);
+torusKnot.rotation.set(0.4, 0.2, 0);
+
+function render() {
+  requestAnimationFrame(render);
+  renderer.render(scene, camera);
+}
+render();
   }
-  
-  /*
-   * The main program
-   */
-  void main() {
-      // Use the mouse position to define the light direction
-      float min_resolution = min(u_resolution.x, u_resolution.y);
-      vec3 light_direction = -vec3((u_mouse - 0.5 * u_resolution) / min_resolution, 0.25);
-  
-      // Set the surface color
-      vec3 surface_color = vec3(0.5 + 0.5 * cos(2.0 * v_position.y + 3.0 * u_time));
-  
-      // Apply the light diffusion factor
-      surface_color *= diffuseFactor(v_normal, light_direction);
-  
-      // Fragment shader output
-      gl_FragColor = vec4(surface_color, 1.0);
-  }
-    `;
-};
+)
 
 const shaderMaterial = new THREE.ShaderMaterial({
   uniforms,
@@ -117,12 +110,3 @@ const shaderMaterial = new THREE.ShaderMaterial({
   },
 });
 
-const torusKnot = new THREE.Mesh(torusKnotGeometry, shaderMaterial);
-scene.add(torusKnot);
-torusKnot.rotation.set(0.4, 0.2, 0);
-
-function render() {
-  requestAnimationFrame(render);
-  renderer.render(scene, camera);
-}
-render();
