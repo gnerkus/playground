@@ -75,7 +75,7 @@ function ShaderLoader(vertex_url, fragment_url, onLoad, onProgress, onError) {
     },
     u_ambientColor: {
         type: "v3",
-        value: new THREE.Vector3(0.75, 0.25, 0.6)
+        value: new THREE.Vector3(0.90, 0.30, 0.72)
     },
     u_specularColor: {
         type: "v3",
