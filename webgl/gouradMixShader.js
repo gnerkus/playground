@@ -97,8 +97,8 @@ function ShaderLoader(vertex_url, fragment_url, onLoad, onProgress, onError) {
   //
   // This can be done better with a bit of refactoring but I hope you get the idea.
   ShaderLoader(
-    "shaders/phongMix.vert",
-    "shaders/phongMix.frag",
+    "shaders/gouradMix.vert",
+    "shaders/gouradMix.frag",
     function (vertex, fragment) {
       const shaderMaterial = new THREE.ShaderMaterial({
         uniforms,

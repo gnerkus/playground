@@ -1,10 +1,5 @@
-#ifdef GL_ES
-precision mediump float;
-#endif
-
 varying vec3 normalInterp;
 varying vec3 vertPos;
-varying vec3 v_normal;
 
 uniform float u_ambientK;   // Ambient reflection coefficient
 uniform float u_diffuseK;   // Diffuse reflection coefficient
@@ -18,7 +13,14 @@ uniform vec3 u_lightPos; // Light position
 uniform vec3 u_firstColor;
 uniform vec3 u_secondColor;
 
+varying vec4 v_color; //color
+
 void main() {
+    vec4 vertPos4 = modelViewMatrix * vec4(position, 1.0);
+    vertPos = vec3(vertPos4) / vertPos4.w;
+    normalInterp = vec3(viewMatrix * vec4(normal, 0.0));
+    gl_Position = projectionMatrix * vertPos4;
+
     vec3 N = normalize(normalInterp);
     vec3 L = normalize(u_lightPos - vertPos);
 
@@ -33,9 +35,9 @@ void main() {
         specular = pow(specAngle, u_shininess);
     }
 
-    vec3 diffuseColor = mix(u_firstColor, u_secondColor, v_normal.x);
+    vec3 diffuseColor = mix(u_firstColor, u_secondColor, normal.x);
 
-    gl_FragColor = vec4(u_ambientK * u_ambientColor +
+    v_color = vec4(u_ambientK * u_ambientColor +
         u_diffuseK * lambertian * diffuseColor +
         u_specularK * specular * u_specularColor, 1.0);
 }
