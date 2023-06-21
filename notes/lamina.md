@@ -2,7 +2,84 @@
 
 ## How does Lamina work
 - appends a uuid to all the uniforms from each of the layers. So a `u_color` uniform from the `Color` layer becomes `u_Color_1_color` in the final shader.
--  
+- extends THREE.CustomShaderMaterial
+- For each layer:
+  1. lamina tokenizes the shaders using [glsl-tokenizer](https://github.com/glslify/glsl-tokenizer)
+  2. then it names the tokens so there are no conflicts with other shaders using [glsl-token-descope](https://github.com/glslify/glsl-token-descope)
+  3. afterwards, it extracts the functions for each shader in the layer using [glsl-token-functions](https://github.com/glslify/glsl-token-functions)
+  4. finally, it converts the tokens into a glsl string using [glsl-token-string](https://github.com/glslify/glsl-token-string)
+  This can be found in the `.buildShaders` method of the [Abstract](https://github.com/pmndrs/lamina/blob/main/src/core/Abstract.ts) class which all layers extend:
+  ```ts
+  buildShaders(constructor: any) {
+      const shaders = Object.getOwnPropertyNames(constructor)
+        .filter((e) => e === 'fragmentShader' || e === 'vertexShader')
+        .reduce(
+          (a, v) => ({
+            ...a,
+            [v]: Object.getOwnPropertyDescriptor(constructor, v)?.value,
+          }),
+          {}
+        ) as {
+        fragmentShader: string
+        vertexShader: string
+      }
+
+      const tokens = {
+        vert: tokenize(shaders.vertexShader || ''),
+        frag: tokenize(shaders.fragmentShader || ''),
+      }
+
+      const descoped = {
+        vert: descope(tokens.vert, this.renameTokens.bind(this)),
+        frag: descope(tokens.frag, this.renameTokens.bind(this)),
+      }
+
+      const funcs = {
+        vert: tokenFunctions(descoped.vert),
+        frag: tokenFunctions(descoped.frag),
+      }
+
+      const mainIndex = {
+        vert: funcs.vert
+          .map((e: any) => {
+            return e.name
+          })
+          .indexOf('main'),
+        frag: funcs.frag
+          .map((e: any) => {
+            return e.name
+          })
+          .indexOf('main'),
+      }
+
+      const variables = {
+        vert: mainIndex.vert >= 0 ? stringify(descoped.vert.slice(0, funcs.vert[mainIndex.vert].outer[0])) : '',
+        frag: mainIndex.frag >= 0 ? stringify(descoped.frag.slice(0, funcs.frag[mainIndex.frag].outer[0])) : '',
+      }
+
+      const funcBodies = {
+        vert: mainIndex.vert >= 0 ? this.getShaderFromIndex(descoped.vert, funcs.vert[mainIndex.vert].body) : '',
+        frag: mainIndex.frag >= 0 ? this.getShaderFromIndex(descoped.frag, funcs.frag[mainIndex.frag].body) : '',
+      }
+
+      this.vertexShader = this.processFinal(funcBodies.vert, true)
+      this.fragmentShader = this.processFinal(funcBodies.frag)
+      this.vertexVariables = variables.vert
+      this.fragmentVariables = variables.frag
+
+      this.onParse?.(this)
+      this.schema = this.schema.filter((value, index) => {
+        const _value = value.label
+        return (
+          index ===
+          this.schema.findIndex((obj) => {
+            return obj.label === _value
+          })
+        )
+      })
+    }
+  ```
+- The `LayerMaterial` extends [CustomMaterial](https://github.com/FarazzShaikh/THREE-CustomShaderMaterial). `CustomShaderMaterial` allows you to extend Three.js's own material library with your own vertex and fragment shaders.
 
 
 ## Shaders used
@@ -12,7 +89,7 @@
 - Depth
 - Noise
 
-_lamin example for a cube-mapped environment_
+_lamina example for a cube-mapped environment_
 
 ```ts
 <LayerMaterial side={THREE.BackSide}>
