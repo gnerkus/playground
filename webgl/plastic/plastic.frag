@@ -214,7 +214,7 @@ varying vec3 v_Noise1_position;
 vec4 getColor1(vec4 finalColor) {
     vec4 outputColor = vec4(u_Color1_color, u_Color1_alpha);
     // blend for normal mode
-    return lamina_blend_alpha(outputColor, finalColor, finalColor.a);
+    return lamina_blend_alpha(finalColor, outputColor, finalColor.a);
 }
 
 vec4 getDepth1(vec4 finalColor) {
@@ -225,11 +225,11 @@ vec4 getDepth1(vec4 finalColor) {
 
     vec4 outputColor = vec4(f_depthColor, u_Depth1_alpha);
 
-    return lamina_blend_multiply(outputColor, finalColor, finalColor.a);
+    return lamina_blend_alpha(finalColor, outputColor, finalColor.a);
 }
 
 vec4 getNoise1(vec4 finalColor) {
-    float f_n = lamina_noise_worley((v_Noise1_position - u_Noise1_offset) - u_Noise1_scale);
+    float f_n = lamina_noise_worley((v_Noise1_position + u_Noise1_offset) * u_Noise1_scale);
 
     float f_step1 = 0.;
     float f_step2 = 0.2;
@@ -241,7 +241,7 @@ vec4 getNoise1(vec4 finalColor) {
     outputMix = mix(outputMix, u_Noise1_colorD, smoothstep(f_step3, f_step4, f_n));
     vec4 outputColor = vec4(outputMix, u_Noise1_alpha);
 
-    return lamina_blend_softlight(outputColor, finalColor, finalColor.a);
+    return lamina_blend_softlight(finalColor, outputColor, finalColor.a);
 }
 
 void main() {
@@ -249,8 +249,10 @@ void main() {
 
     // Color1
     lamina_finalColor = getColor1(lamina_finalColor);
+
     // Depth 1
     lamina_finalColor = getDepth1(lamina_finalColor);
+
     // Noise 1
     lamina_finalColor = getNoise1(lamina_finalColor);
 
