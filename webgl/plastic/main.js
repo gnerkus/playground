@@ -10,43 +10,75 @@ const scene = createScene();
 const torusKnotGeometry = createTorusMesh();
 
 const uniforms = {
-  u_firstColor: {
+  u_lamina_color: {
     type: "v3",
-    value: new THREE.Vector3(0.0, 1.0, 0.0),
+    value: new THREE.Color('white').convertSRGBToLinear()
   },
-  u_secondColor: {
-    type: "v3",
-    value: new THREE.Vector3(1.0, 0.0, 0.0),
-  },
-  u_ambientK: {
+  u_lamina_alpha: {
     type: "f",
-    value: 1.0,
+    value: 1.0
   },
-  u_diffuseK: {
-    type: "f",
-    value: 1.0,
-  },
-  u_specularK: {
-    type: "f",
-    value: 1.0,
-  },
-  u_shininess: {
-    type: "f",
-    value: 80.0,
-  },
-  u_ambientColor: {
+  u_Color1_color: {
     type: "v3",
-    value: new THREE.Vector3(0.9, 0.3, 0.72),
+    value: new THREE.Color('#f0aed2').convertSRGBToLinear(),
   },
-  u_specularColor: {
+  u_Color1_alpha: {
+    type: "f",
+    value: 1.0
+  },
+  u_Depth1_alpha: {
+    type: "f",
+    value: 0.5
+  },
+  u_Depth1_near: {
+    type: "f",
+    value: 0.0
+  },
+  u_Depth1_far: {
+    type: "f",
+    value: 300.0
+  },
+  u_Depth1_origin: {
     type: "v3",
-    value: new THREE.Vector3(1.0, 1.0, 1.0),
+    value: new THREE.Vector3(100, 100, 100),
   },
-  u_lightPos: {
+  u_Depth1_colorA: {
     type: "v3",
-    value: new THREE.Vector3(1.0, 1.0, -1.0),
+    value: new THREE.Color('blue').convertSRGBToLinear(),
   },
-};
+  u_Depth1_colorB: {
+    type: "v3",
+    value: new THREE.Color('#00aaff').convertSRGBToLinear(),
+  },
+  u_Noise1_offset: {
+    type: "v3",
+    value: new THREE.Vector3(0, 0, 0),
+  },
+  u_Noise1_scale: {
+    type: "f",
+    value: 0.5
+  },
+  u_Noise1_colorA: {
+    type: "v3",
+    value: new THREE.Color('#666666').convertSRGBToLinear(),
+  },
+  u_Noise1_colorB: {
+    type: "v3",
+    value: new THREE.Color('#666666').convertSRGBToLinear(),
+  },
+  u_Noise1_colorC: {
+    type: "v3",
+    value: new THREE.Color('#ffffff').convertSRGBToLinear(),
+  },
+  u_Noise1_colorD: {
+    type: "v3",
+    value: new THREE.Color('#ffffff').convertSRGBToLinear(),
+  },
+  u_Noise1_alpha: {
+    type: "f",
+    value: 1.0
+  },
+}
 
 ShaderLoader(
   "shaders/plastic.vert",
@@ -60,6 +92,7 @@ ShaderLoader(
       extensions: {
         derivatives: true,
       },
+      side: THREE.BackSide,
     });
 
     const torusKnot = new THREE.Mesh(torusKnotGeometry, shaderMaterial);
