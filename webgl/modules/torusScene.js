@@ -1,3 +1,5 @@
+import * as THREE from "three";
+
 function createRenderer() {
   const WIDTH = window.innerWidth;
   const HEIGHT = window.innerHeight;
@@ -17,6 +19,8 @@ function createRenderer() {
 }
 
 function createScene() {
+  const WIDTH = window.innerWidth;
+  const HEIGHT = window.innerHeight;
   const scene = new THREE.Scene();
 
   const camera = new THREE.PerspectiveCamera(70, WIDTH / HEIGHT);
