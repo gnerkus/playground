@@ -1,3 +1,8 @@
+# Lamina Noise (old)
+```ts
+<Noise mapping="local" type="cell" scale={0.5} mode="softlight" />
+``` 
+
 # Lamina example structure
 
 ## How does Lamina work
