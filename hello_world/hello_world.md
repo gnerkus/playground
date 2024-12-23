@@ -17,7 +17,7 @@ This should print "hello, world!" to the console.
 ```bash
 emcc hello_world.c -o hello.html
 ```
-This should output three files in the root directory: `hello.js`, `hello.wasm` and `hello.html`.
+This should output three files in the root directory: `hello.ts`, `hello.wasm` and `hello.html`.
 
 ## 2. Open the HTML file in a web server
 Navigate to the root of the project and type:
