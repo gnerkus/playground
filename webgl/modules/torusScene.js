@@ -18,15 +18,18 @@ function createRenderer() {
   return renderer;
 }
 
-function createScene() {
+function createCamera() {
   const WIDTH = window.innerWidth;
   const HEIGHT = window.innerHeight;
-  const scene = new THREE.Scene();
-
   const camera = new THREE.PerspectiveCamera(70, WIDTH / HEIGHT);
   camera.position.z = 50;
 
-  scene.add(camera);
+  return camera;
+}
+
+function createScene() {
+  
+  const scene = new THREE.Scene();
 
   return scene;
 }
@@ -36,4 +39,4 @@ function createTorusMesh() {
   return torusKnotGeometry;
 }
 
-export { createScene, createTorusMesh, createRenderer };
+export { createScene, createTorusMesh, createRenderer, createCamera };

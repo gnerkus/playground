@@ -1,12 +1,15 @@
+import * as THREE from "three";
 import ShaderLoader from "../modules/shaderLoader.js";
 import {
   createScene,
   createTorusMesh,
   createRenderer,
+  createCamera,
 } from "../modules/torusScene.js";
 
 const renderer = createRenderer();
 const scene = createScene();
+const camera = createCamera();
 const torusKnotGeometry = createTorusMesh();
 
 const uniforms = {
@@ -49,8 +52,8 @@ const uniforms = {
 };
 
 ShaderLoader(
-  "shaders/gouradMix.vert",
-  "shaders/gouradMix.frag",
+  "gouradMix.vert",
+  "gouradMix.frag",
   function (vertex, fragment) {
     const shaderMaterial = new THREE.ShaderMaterial({
       uniforms,
@@ -65,6 +68,8 @@ ShaderLoader(
     const torusKnot = new THREE.Mesh(torusKnotGeometry, shaderMaterial);
     scene.add(torusKnot);
     torusKnot.rotation.set(0.4, 0.2, 0);
+
+    scene.add(camera);
 
     function render() {
       requestAnimationFrame(render);
