@@ -13,47 +13,29 @@ const camera = createCamera();
 const torusKnotGeometry = createTorusMesh();
 
 const uniforms = {
-  u_firstColor: {
-    type: "v3",
-    value: new THREE.Vector3(0.0, 1.0, 0.0),
+  u_time : {
+    type : "f",
+    value : 0.0
   },
-  u_secondColor: {
-    type: "v3",
-    value: new THREE.Vector3(1.0, 0.0, 0.0),
+  u_frame : {
+    type : "f",
+    value : 0.0
   },
-  u_ambientK: {
-    type: "f",
-    value: 1.0,
+  u_resolution : {
+    type : "v2",
+    value : new THREE.Vector2(window.innerWidth, window.innerHeight)
+        .multiplyScalar(window.devicePixelRatio)
   },
-  u_diffuseK: {
-    type: "f",
-    value: 1.0,
-  },
-  u_specularK: {
-    type: "f",
-    value: 1.0,
-  },
-  u_shininess: {
-    type: "f",
-    value: 80.0,
-  },
-  u_ambientColor: {
-    type: "v3",
-    value: new THREE.Vector3(0.9, 0.3, 0.72),
-  },
-  u_specularColor: {
-    type: "v3",
-    value: new THREE.Vector3(1.0, 1.0, 1.0),
-  },
-  u_lightPos: {
-    type: "v3",
-    value: new THREE.Vector3(1.0, 1.0, -1.0),
-  },
+  u_mouse : {
+    type : "v2",
+    value : new THREE.Vector2(0.7 * window.innerWidth, window.innerHeight)
+        .multiplyScalar(window.devicePixelRatio)
+  }
 };
 
 ShaderLoader(
-  "gouradMix.vert",
-  "gouradMix.frag",
+  "toon.vert",
+  "toon.frag",
   function (vertex, fragment) {
     const shaderMaterial = new THREE.ShaderMaterial({
       uniforms,
@@ -63,6 +45,7 @@ ShaderLoader(
       extensions: {
         derivatives: true,
       },
+      side: THREE.DoubleSide
     });
 
     const torusKnot = new THREE.Mesh(torusKnotGeometry, shaderMaterial);
