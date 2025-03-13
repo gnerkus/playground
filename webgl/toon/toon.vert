@@ -3,6 +3,8 @@ varying vec3 v_position;
 // normal vector for each vector
 varying vec3 v_normal;
 
+varying vec2 vUv;
+
 // ========= BUILT-IN UNIFORMS & ATTRIBUTES ==========================//
 // Reference: https://threejs.org/docs/#api/en/renderers/webgl/WebGLProgram
 // = object.matrixWorld
@@ -28,6 +30,7 @@ attribute vec3 normal;
 attribute vec2 uv;
 
 void main() {
+    vUv = uv;
     v_position = position;
     v_normal = normalize(normalMatrix * normal);
 

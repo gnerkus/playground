@@ -7,9 +7,12 @@ uniform vec2 u_mouse;
 uniform float u_time;
 uniform float u_frame;
 
+uniform sampler2D texture1;
+
 // Common varyings
 varying vec3 v_position;
 varying vec3 v_normal;
+varying vec2 vUv;
 
 /*
  *  Calculates the diffuse factor produced by the light illumination
@@ -28,6 +31,9 @@ float diffuseFactor(vec3 normal, vec3 light_direction) {
  * The main program
  */
 void main() {
+    // get color from texture
+    vec4 color = texture2D(texture1, vUv);
+
     // Use the mouse position to define the light direction
     float min_resolution = min(u_resolution.x, u_resolution.y);
     vec3 light_direction = -vec3((u_mouse - 0.5 * u_resolution) / min_resolution, 0.5);
